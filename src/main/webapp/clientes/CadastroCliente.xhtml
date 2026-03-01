@@ -79,6 +79,14 @@
 							<p:inputText styleClass="campo35" id="cpfCnpj"
 								value="#{cadastroClienteBean.cliente.cpfCnpj}" />
 						</p:outputLabel>
+						
+						<p:outputLabel value="Status" for="status">
+							<p:selectOneMenu styleClass="campo25" id="status"
+								value="#{cadastroClienteBean.cliente.status}">
+								<f:selectItem itemLabel="Ativo" itemValue="true"></f:selectItem>
+								<f:selectItem itemLabel="Inativo" itemValue="false"></f:selectItem>
+							</p:selectOneMenu>
+						</p:outputLabel>
 
 						<p:keyFilter for="cpfCnpj" mask="int" preventPaste="false" />
 

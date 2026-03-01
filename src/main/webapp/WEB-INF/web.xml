@@ -20,11 +20,6 @@
     <servlet-name>Faces Servlet</servlet-name>
     <url-pattern>*.xhtml</url-pattern>
   </servlet-mapping>
-  <servlet>
-    <servlet-name>CreateConfiguration</servlet-name>
-    <servlet-class>br.com.ajasoftware.repository.factory.CreateConfiguration</servlet-class>
-    <load-on-startup>2</load-on-startup>
-  </servlet>
   <context-param>
     <param-name>primefaces.THEME</param-name>
     <param-value>bootstrap</param-value>

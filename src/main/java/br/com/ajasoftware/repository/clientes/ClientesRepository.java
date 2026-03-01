@@ -21,6 +21,7 @@ import br.com.ajasoftware.repository.despesas.DespesasRepository;
 import br.com.ajasoftware.repository.receitas.ReceitasRepository;
 import br.com.ajasoftware.repository.transactional.Transactional;
 import br.com.ajasoftware.service.msg.NegocioException;
+import br.com.ajasoftware.util.Trata;
 
 public class ClientesRepository implements Serializable{
 
@@ -47,6 +48,9 @@ public class ClientesRepository implements Serializable{
 		}
 		if(filtro.getId()!=null) {
 			predicates.add(builder.equal(clienteRoot.get("id"), filtro.getId()));
+		}
+		if(Trata.Boolean(filtro.getSoAtivos())) {
+			predicates.add(builder.equal(clienteRoot.get("status"), filtro.getSoAtivos()));
 		}
 
 		return predicates;
@@ -103,13 +107,13 @@ public class ClientesRepository implements Serializable{
 	
 	@Transactional
 	public Cliente guardar(Cliente p) throws NegocioException{
-		// TODO Auto-generated method stub
+		
 		return manager.merge(p);
 	}
 
 	@Transactional
 	public void excluir(Cliente cliente) throws NegocioException{
-		// TODO Auto-generated method stub
+		
 		try{
 			Long qtde= receitas.getReceitaPorCliente(cliente)+despesas.getDespesaPorCliente(cliente);
 			

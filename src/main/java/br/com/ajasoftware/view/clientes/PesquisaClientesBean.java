@@ -17,6 +17,8 @@ import br.com.ajasoftware.repository.clientes.FiltroCliente;
 import br.com.ajasoftware.repository.clientes.ClientesRepository;
 import br.com.ajasoftware.service.msg.NegocioException;
 import br.com.ajasoftware.util.jsf.FacesUtil;
+import lombok.Getter;
+import lombok.Setter;
 
 @Named
 @ViewScoped
@@ -33,6 +35,9 @@ public class PesquisaClientesBean implements Serializable{
 	private LazyDataModel<Cliente> model;
 	private FiltroCliente filtro;
 	private Cliente cliente;
+	
+	@Getter @Setter
+	private Boolean soAtivos;
 
 	public void inicializar() {
 
@@ -50,6 +55,7 @@ public class PesquisaClientesBean implements Serializable{
 				filtro.setQuantidadeRegistros(pageSize);
 				filtro.setPropriedadeOrdenacao(sortField);
 				filtro.setAscendente(SortOrder.ASCENDING.equals(sortOrder));
+				filtro.setSoAtivos(soAtivos);
 				setRowCount(clientes.quantidadeFiltrados(filtro));
 				return (List<Cliente>) clientes.filtrados(filtro);
 			}

@@ -1,0 +1,13 @@
+.ui-icon-pdf{
+    background-image: url("#{resource['ajasoftware/images/pdf.png']}") !important;
+    width: 100% !important;
+    height: 100% !important;
+    top: 8px !important;
+    left: 5px !important;
+}
+.ui-icon-sintoma{
+    background-image: url("#{resource['ajasoftware/images/sintoma.png']}") !important;
+}
+.ui-icon-patologia{
+    background-image: url("#{resource['ajasoftware/images/patologia.png']}") !important;
+}

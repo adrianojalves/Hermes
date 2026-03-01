@@ -1,0 +1,126 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui"
+	template="/WEB-INF/templates/Layout.xhtml">
+
+	<f:metadata>
+		<o:viewParam name="cod" value="#{cadastroDespesaBean.despesa}"
+			converter="#{converter}" />
+		<f:viewAction action="#{cadastroDespesaBean.inicializar}"></f:viewAction>
+	</f:metadata>
+
+	<ui:define name="content">
+		<div class="ui-fluid paginas">
+			<h:form id="frm">
+				<div style="margin-top: 60px" />
+
+				<p:growl id="msg" autoUpdate="true" life="6000" sticky="false" />
+
+				<p:toolbar style="margin-top: 10px">
+					<p:toolbarGroup>
+						<p:commandButton process="@this painelCadastro" icon="fa fa-save"
+							update="frm" value="Salvar"
+							action="#{cadastroDespesaBean.guardar}" />
+					</p:toolbarGroup>
+
+					<p:toolbarGroup styleClass="botoes-cadastro" align="right">
+						<p:commandButton process="@this" icon="fa fa-plus"
+							update="frm" value="Novo"
+							action="#{cadastroDespesaBean.limpar}" />
+						
+						<p:separator />
+						<p:button icon="fa fa-undo"
+							outcome="ListaDespesas?faces-redirect=true" value="Pesquisa"
+							process="@this">
+						</p:button>
+					</p:toolbarGroup>
+				</p:toolbar>
+
+				<p:fieldset legend="Dados Gerais" style="margin-top: 10px;">
+					<p:panelGrid styleClass="remove-borda painel-cadastro"
+						layout="grid" columns="1" id="painelCadastro"
+						style="line-heigth:20px" columnClasses="ui-grid-col-10">
+
+						<p:outputLabel value="Código: ">
+							<p:outputLabel value="#{cadastroDespesaBean.despesa.id}" />
+						</p:outputLabel>
+
+						<p:outputLabel value="Cliente" for="cliente">
+							<p:autoComplete id="cliente" label="Cliente"
+								placeholder="Digite o nome do cliente ou clique na lupa para pesquisar"
+								value="#{cadastroDespesaBean.despesa.codCliente}"
+								completeMethod="#{completerMethods.completaCliente}"
+								forceSelection="true" var="cli" itemLabel="#{cli.nome}"
+								itemValue="#{cli}" styleClass="campo75 pesquisaLupa"
+								minQueryLength="2" maxResults="10">
+								<f:converter binding="#{converter}" />
+								<p:ajax event="itemSelect" update=":frm:cliente :frm:msg" />
+							</p:autoComplete>
+							<p:commandButton style="width:35px" icon="ui-icon-search"
+								title="Pesquisar" process="@this" update="@none" id="bpesqcli"
+								action="#{dialogosBean.abrirDialogoCliente}"
+								ignoreAutoUpdate="true">
+								<p:ajax event="dialogReturn"
+									listener="#{cadastroDespesaBean.capturaCliente}"
+									update=":frm:cliente :frm:msg" />
+							</p:commandButton>
+						</p:outputLabel>
+						
+						<p:outputLabel value="Conta" for="conta">
+							<p:autoComplete id="conta" label="Conta"
+								placeholder="Digite o nome da conta ou clique na lupa para pesquisar"
+								value="#{cadastroDespesaBean.despesa.codConta}"
+								completeMethod="#{completerMethods.completaConta}"
+								forceSelection="true" var="con" itemLabel="#{con.label}"
+								itemValue="#{con}" styleClass="campo75 pesquisaLupa"
+								minQueryLength="2" maxResults="10">
+								<f:converter binding="#{converter}" />
+								<p:ajax event="itemSelect" listener="#{cadastroDespesaBean.configuraConta}" update=":frm:conta :frm:descricao :frm:msg" />
+							</p:autoComplete>
+							<p:commandButton style="width:35px" icon="ui-icon-search"
+								title="Pesquisar" process="@this" update="@none" id="bpesqcon"
+								action="#{dialogosBean.abrirDialogoConta}"
+								ignoreAutoUpdate="true">
+								<p:ajax event="dialogReturn"
+									listener="#{cadastroDespesaBean.capturaConta}"
+									update=":frm:conta :frm:descricao :frm:msg" />
+							</p:commandButton>
+						</p:outputLabel>
+
+						<p:outputLabel value="Descrição" for="descricao">
+							<p:inputText styleClass="campo100" id="descricao"
+								value="#{cadastroDespesaBean.despesa.descricao}" />
+						</p:outputLabel>
+
+						<p:outputLabel value="Data" for="data">
+							<p:calendar styleClass="campo50" showOn="button" id="data"
+								value="#{cadastroDespesaBean.despesa.data}" navigator="true"
+								pattern="#{patterns.data}" locale="pt_BR" mask="true" />
+						</p:outputLabel>
+
+						<p:outputLabel value="Valor" for="valor">
+							<p:inputNumber styleClass="campo35 input-right" id="valor"
+								decimalPlaces="2" thousandSeparator="." decimalSeparator=","
+								value="#{cadastroDespesaBean.despesa.valor}" />
+						</p:outputLabel>
+
+						<p:outputLabel value="CPF/CNPJ Beneficiário" for="cpfCnpjBeneficiario">
+							<p:inputText styleClass="campo35" id="cpfCnpjBeneficiario"
+								value="#{cadastroDespesaBean.despesa.cpfCnpjBeneficiario}" />
+						</p:outputLabel>
+						
+						<p:outputLabel value="CPF/CNPJ Titular" for="cpfCnpjTitular">
+							<p:inputText styleClass="campo35" id="cpfCnpjTitular"
+								value="#{cadastroDespesaBean.despesa.cpfCnpjTitular}" />
+						</p:outputLabel>
+
+						<p:keyFilter for="cpfCnpjBeneficiario" mask="int" preventPaste="false" />
+						<p:keyFilter for="cpfCnpjTitular" mask="int" preventPaste="false" />
+					</p:panelGrid>
+				</p:fieldset>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

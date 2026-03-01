@@ -1,0 +1,306 @@
+package br.com.ajasoftware.repository.receitas;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.From;
+import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.EncryptedDocumentException;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.primefaces.event.FileUploadEvent;
+
+import br.com.ajasoftware.filtro.FiltroGeral;
+import br.com.ajasoftware.model.cliente.Cliente;
+import br.com.ajasoftware.model.receita.Receita;
+import br.com.ajasoftware.repository.transactional.Transactional;
+import br.com.ajasoftware.security.UsuarioLogado;
+import br.com.ajasoftware.security.UsuarioSistema;
+import br.com.ajasoftware.service.msg.NegocioException;
+import br.com.ajasoftware.util.Funcoes;
+import br.com.ajasoftware.util.Trata;
+import br.com.ajasoftware.util.jsf.FacesUtil;
+
+public class ReceitasRepository implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private EntityManager manager;
+
+	@Inject
+	@UsuarioLogado
+	private UsuarioSistema usuario;
+
+	@Inject
+	private Funcoes funcoes;
+
+	private List<Predicate> criarPredicatesParaFiltro(FiltroReceitas filtro, Root<Receita> receitaRoot,
+			From<?, ?> clienteJoin) {
+		CriteriaBuilder builder = manager.getCriteriaBuilder();
+		List<Predicate> predicates = new ArrayList<>();
+
+		if(StringUtils.isNotBlank(filtro.getDescricao())){
+			predicates.add(builder.like(builder.upper(receitaRoot.get("descricao")), "%" + filtro.getDescricao().toUpperCase() + "%"));
+		}
+		if(filtro.getId()!=null) {
+			predicates.add(builder.equal(receitaRoot.get("id"), filtro.getId()));
+		}
+		if(StringUtils.isNotBlank(filtro.getDocumento())) {
+			predicates.add(builder.equal(receitaRoot.get("documento"), filtro.getDocumento()));
+		}
+		if(filtro.getDataInicial()!=null){
+			predicates.add(builder.greaterThanOrEqualTo(receitaRoot.get("data"), filtro.getDataInicial()));
+		}
+		if(filtro.getDataFinal()!=null){
+			predicates.add(builder.lessThanOrEqualTo(receitaRoot.get("data"), filtro.getDataFinal()));
+		}
+		if(filtro.getCodCliente()!=null) {
+			predicates.add(builder.equal(clienteJoin.get("id"), filtro.getCodCliente().getId()));
+		}
+
+		return predicates;
+	}
+
+	public List<Receita> filtrados(FiltroReceitas filtro) {
+
+		From<?, ?> orderByFromEntity = null;
+
+		CriteriaBuilder builder = manager.getCriteriaBuilder();
+		CriteriaQuery<Receita> criteriaQuery = builder.createQuery(Receita.class);
+
+		Root<Receita> receitaRoot = criteriaQuery.from(Receita.class);
+		From<?,?> clienteJoin = receitaRoot.join("codCliente", JoinType.INNER);
+
+		List<Predicate> predicates = criarPredicatesParaFiltro(filtro, receitaRoot, clienteJoin);
+
+		criteriaQuery.select(receitaRoot);
+		criteriaQuery.where(predicates.toArray(new Predicate[0]));
+
+
+		String nomePropriedadeOrdenacao = StringUtils.isNotBlank(filtro.getPropriedadeOrdenacao())?
+				filtro.getPropriedadeOrdenacao():"data";
+				orderByFromEntity = receitaRoot;			
+
+				if (filtro.isAscendente()) {
+					criteriaQuery.orderBy(builder.asc(orderByFromEntity.get(nomePropriedadeOrdenacao)));
+				} else{
+					criteriaQuery.orderBy(builder.desc(orderByFromEntity.get(nomePropriedadeOrdenacao)));
+				}
+
+				TypedQuery<Receita> query = manager.createQuery(criteriaQuery);
+				if(filtro.getQuantidadeRegistros()!=FiltroGeral.TODOS) {
+					query.setFirstResult(filtro.getPrimeiroRegistro());
+					query.setMaxResults(filtro.getQuantidadeRegistros());
+				}
+
+				return query.getResultList();
+	}
+	public int quantidadeFiltrados(FiltroReceitas filtro){
+		CriteriaBuilder builder = manager.getCriteriaBuilder();
+		CriteriaQuery<Long> criteriaQuery = builder.createQuery(Long.class);
+
+		Root<Receita> receitaRoot = criteriaQuery.from(Receita.class);
+		From<?,?> clienteJoin = receitaRoot.join("codCliente", JoinType.INNER);
+
+		List<Predicate> predicates = criarPredicatesParaFiltro(filtro, receitaRoot, clienteJoin);
+
+		criteriaQuery.select(builder.count(receitaRoot));
+		criteriaQuery.where(predicates.toArray(new Predicate[0]));
+
+		TypedQuery<Long> query = manager.createQuery(criteriaQuery);
+
+		return query.getSingleResult().intValue();
+	}
+
+	@Transactional
+	public Receita guardar(Receita p) throws NegocioException{
+		// TODO Auto-generated method stub
+		return manager.merge(p);
+	}
+
+	@Transactional
+	public void excluir(Receita usu) throws NegocioException{
+		// TODO Auto-generated method stub
+		try{
+			Long qtde= 0l;
+
+			if(qtde==0){
+				usu = manager.find(Receita.class, usu.getId());
+				manager.remove(usu);
+				manager.flush();
+			}
+			else{
+				throw new NegocioException("Receita não pode ser excluída.");
+			}
+		}
+		catch(NegocioException e){
+			throw new NegocioException(e.getMessage());
+		}
+		catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			throw new NegocioException("A exclusão não pode ser executada!");
+		}
+	}
+
+	public Long getReceitaPorCliente(Cliente c) {
+		try {
+			return (Long)manager.createQuery(" select count(*) from Receita where codCliente.id = :cli ")
+					.setParameter("cli", c.getId())
+					.getSingleResult();
+		}
+		catch(NoResultException ex) {
+			return 0l;
+		}
+	}
+
+	@Transactional
+	public void importarXls(FileUploadEvent arquivo, Cliente cliente) throws NegocioException{
+		// TODO Auto-generated method stub]
+		String erros="";
+		//		WorkbookSettings conf = new WorkbookSettings();
+		//		conf.setEncoding("ISO-8859-1");
+		try {
+			Workbook workbook = WorkbookFactory.create(arquivo.getFile().getInputstream());
+			Iterator<Row> rowIterator = null;
+			Row row  = null;
+			Iterator<Cell> cellIterator = null;
+			Cell cell = null;
+			DataFormatter dataFormatter = new DataFormatter();
+			int i=0;
+			Receita receita = null;
+			String cellValue =null;
+			for(Sheet sheet: workbook) {
+				rowIterator  = sheet.rowIterator();
+
+				while (rowIterator.hasNext()) {
+					row = rowIterator.next();
+
+					cellIterator = row.cellIterator();
+
+					receita = new Receita();
+					receita.setCodCliente(cliente);
+					while (cellIterator.hasNext()) {
+						cell = cellIterator.next();
+						cellValue = dataFormatter.formatCellValue(cell);
+						if(cellValue!=null) {
+							if(i==0) {
+								receita.setDocumento(funcoes.removeFormatacao(cellValue));
+								i++;
+							}
+							else if(i==1) {
+								receita.setDescricao(cellValue.toUpperCase());
+								i++;
+							}
+							else if(i==2) {
+								receita.setValor(retornaValor(cellValue));
+								i++;
+							}
+							else if(i==3) {
+								System.out.println("data="+cellValue+" "+Trata.DataAmericano(cellValue));
+								receita.setData(Trata.Data(cellValue));
+								if(receita.getData()!=null) {
+									LocalDate dataLocalDate = receita.getData().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+									if(dataLocalDate.getYear()<999) {
+										receita.setData(Trata.Data(dataLocalDate.getDayOfMonth()+"/"+dataLocalDate.getMonthValue()+"/"+(dataLocalDate.getYear()+2000)));
+									}
+								}
+								i=0;
+								break;
+							}
+						}
+					}//FIM DO FOR DA CELULA
+					
+					if(receita.getData()!=null && receita.getValor()!=null &&
+							receita.getValor().compareTo(BigDecimal.ZERO)!=0) {
+						receita = manager.merge(receita);
+					}
+					else {
+						if(StringUtils.isNotBlank(receita.getDocumento())) {
+							System.out.println("doc="+receita.getDocumento());
+							erros+="Doc: "+receita.getDocumento()+" não importado. ";
+						}
+					}
+				}
+			}
+
+			if(erros.length()>0) {
+				FacesUtil.addWarnMessage(erros);
+			}
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new NegocioException("Erro ao ler arquivo.");
+		} catch (EncryptedDocumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new NegocioException("Erro ao ler arquivo.");
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new NegocioException("Erro ao ler arquivo.");
+		}
+	}
+	
+	public static void main(String[] args) {
+		Date data = Trata.FormData("01/01/0023");
+		LocalDate dataLocalDate = data.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+		System.out.println(dataLocalDate);
+		System.out.println(Trata.FormData(Trata.Data(dataLocalDate.getDayOfMonth()+"/"+dataLocalDate.getMonthValue()+"/"+(dataLocalDate.getYear()+2000))));
+	}
+
+	private BigDecimal retornaValor(String valor) {
+		// TODO Auto-generated method stub
+		valor = funcoes.removeFormatacao(valor).replace("R", "").replace("$", "")
+				.replace("\"", "");
+		//		System.out.println("nov="+valor);
+		BigDecimal v = Trata.BigDecimal(valor);
+		return v;
+	}
+
+	@Transactional
+	public int excluirSelecao(FiltroReceitas filtro) throws NegocioException {
+		// TODO Auto-generated method stub
+		if(filtro.getCodCliente()==null){
+			throw new NegocioException("Selecione o cliente.");
+		}
+
+		if(filtro.getDataFinal()==null || filtro.getDataInicial()==null) {
+			throw new NegocioException("Selecione a data incial e final");
+		}
+
+		return manager.createQuery("delete from Receita where codCliente.id = :cliente "
+				+ " and data between :data1 and :data2")
+				.setParameter("cliente", filtro.getCodCliente().getId())
+				.setParameter("data1", filtro.getDataInicial())
+				.setParameter("data2", filtro.getDataFinal())
+				.executeUpdate();
+	}
+}

@@ -1,0 +1,90 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui"
+	template="/WEB-INF/templates/Layout.xhtml">
+
+	<f:metadata>
+		<o:viewParam name="cod" value="#{cadastroClienteBean.cliente}"
+			converter="#{converter}" />
+		<f:viewAction action="#{cadastroClienteBean.inicializar}"></f:viewAction>
+	</f:metadata>
+
+	<ui:define name="content">
+		<div class="ui-fluid paginas">
+			<h:form id="frm">
+				<div style="margin-top: 60px" />
+
+				<p:growl id="msg" autoUpdate="true" life="6000" sticky="false" />
+
+				<p:toolbar style="margin-top: 10px">
+					<p:toolbarGroup>
+						<p:commandButton process="@this painelCadastro" icon="fa fa-save"
+							update="frm" value="Salvar"
+							action="#{cadastroClienteBean.guardar}" />
+					</p:toolbarGroup>
+
+					<p:toolbarGroup styleClass="botoes-cadastro" align="right">
+						<p:button icon="fa fa-undo"
+							outcome="ListaClientes?faces-redirect=true" value="Pesquisa"
+							process="@this">
+						</p:button>
+					</p:toolbarGroup>
+				</p:toolbar>
+
+				<p:fieldset legend="Dados Gerais" style="margin-top: 10px;">
+					<p:panelGrid styleClass="remove-borda painel-cadastro"
+						layout="grid" columns="1" id="painelCadastro"
+						style="line-heigth:20px" columnClasses="ui-grid-col-10">
+
+						<p:outputLabel value="Código: ">
+							<p:outputLabel value="#{cadastroClienteBean.cliente.id}" />
+						</p:outputLabel>
+
+						<p:outputLabel value="Nome" for="nome">
+							<p:inputText styleClass="campo75" id="nome"
+								value="#{cadastroClienteBean.cliente.nome}" />
+						</p:outputLabel>
+
+						<p:outputLabel value="Titular" for="titular">
+							<p:inputText styleClass="campo35" id="titular"
+								value="#{cadastroClienteBean.cliente.titular}" />
+						</p:outputLabel>
+
+						<p:outputLabel value="CEP" for="cep">
+							<p:inputMask mask="99.999-999" styleClass="campo35"
+								value="#{cadastroClienteBean.cliente.cep}" id="cep" />
+						</p:outputLabel>
+
+						<p:outputLabel value="Endereço" for="endereco">
+							<p:inputText styleClass="campo75" id="endereco"
+								value="#{cadastroClienteBean.cliente.endereco}" />
+						</p:outputLabel>
+
+						<p:outputLabel value="Cidade" for="cidade">
+							<p:inputText styleClass="campo50" id="cidade"
+								value="#{cadastroClienteBean.cliente.cidade}" />
+						</p:outputLabel>
+
+						<p:outputLabel value="UF" for="uf">
+							<p:selectOneMenu styleClass="campo25" id="uf"
+								value="#{cadastroClienteBean.cliente.uf}">
+								<f:selectItems value="#{arrayUtils.estados}" var="uf"
+									itemLabel="#{uf.nome}" itemValue="#{uf}" />
+							</p:selectOneMenu>
+						</p:outputLabel>
+						
+						<p:outputLabel value="CPF/CNPJ" for="cpfCnpj">
+							<p:inputText styleClass="campo35" id="cpfCnpj"
+								value="#{cadastroClienteBean.cliente.cpfCnpj}" />
+						</p:outputLabel>
+
+						<p:keyFilter for="cpfCnpj" mask="int" preventPaste="false" />
+
+					</p:panelGrid>
+				</p:fieldset>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

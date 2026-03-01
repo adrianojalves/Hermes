@@ -1,0 +1,166 @@
+/* BASE */
+body {
+	margin: 0;
+	font-size: 13px;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+label{
+	font-weight: bold !important;
+}
+
+/* TABVIEW */
+.ui-tabs .ui-tabs-nav li.ui-tabs-selected a {
+	color: #555;
+}
+
+@media (max-width: 640px) {
+	.ui-tabs.ui-tabs-top > .ui-tabs-nav li {
+		width: 100%;
+	}
+}
+
+/* PANELGRID */
+.ui-panelgrid.panelgrid-noborder .ui-grid-responsive {
+	border: none;
+}
+
+@media (max-width: 640px) {
+	.ui-panelgrid.panelgrid-noborder .ui-grid-responsive .ui-grid-row {
+		border: none;
+	}
+}
+.ui-panelmenu .ui-panelmenu-header a{
+	text-decoration: none;
+}
+
+.ui-growl{
+	top: 100px !important;		
+}
+
+@media(min-width: 550px){
+	.ui-growl{
+		margin-right: 100px !important;
+	}
+}
+@media(max-width: 549px){
+	.ui-growl{
+		margin-right: auto !important;
+	}
+}
+.ui-panelgrid .ui-panelgrid-cell{
+	padding: 3px !important;
+}
+@media (max-width: 640px){
+	.ui-datatable-reflow .ui-datatable-data td[role="gridcell"]{
+		line-height: 15px;
+	}
+}
+.coluna-tabela{
+	border: none;	
+}
+.coluna-tabela div{
+	border: none;
+	background: none !important;
+}
+.ql-container.ql-snow{
+	border: 1px solid #ccc !important;
+}
+.remove-borda div{
+	border: none !important;
+}
+div.botoes-cadastro > button{
+	width:auto !important;
+}
+@media(max-width: 899px){
+	div.botoes-cadastro > button{
+		width:50px; !important;
+	}
+}
+
+.ui-selectonemenu label{
+	font-weight: bold !important;
+}
+.ui-widget-content{
+/* 	font-weight: bold !important; */
+	background-color: #ede7e7 !important;
+	border-color: #BC8623;
+	color: #BC8623 !important;
+}
+
+.ui-widget-overlay{
+	background: #929292 !important;
+}
+
+.ui-widget-content .ui-datatable-odd{
+	background: #E6E6E6 !important;
+}
+.ui-widget-content .ui-datatable-odd:hover{
+	background: #CEE3F6 !important;
+}
+.ui-widget-content .ui-datatable-even:hover{
+	background: #CEE3F6 !important;
+}
+.ui-grid-row{
+	border: 0 none !important;
+}
+.botaopdf{
+	width: 45px !important;
+	height: 49px !important;
+}
+.ui-button-text{
+	color: #BC8623 !important;
+}
+.ui-datatable-data{
+	font-weight: bold !important;
+}
+.ql-editor{
+	font-size: 1.2em !important;
+}
+.ui-fieldset-legend{
+	font-weight: bold !important;
+}
+.ql-toolbar{
+	background: #eeeeec !important;
+}
+.ui-widget-header{
+	background-color: #ede7e7 !important;
+	color: #a16800 !important;
+}
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default{
+	color: #a16800 !important;
+}
+@media (min-width: 960px) {
+     .ui-dialog {
+         width: 950px! important;
+         left: 217px !important;
+     }
+}
+
+
+@media (min-width: 640px) and (max-width: 960px) {
+     .ui-dialog {
+         width: 557px! important;
+     }
+}
+
+@media (min-width: 480px) and (max-width: 640px) {
+     .ui-dialog {
+         width: 360px! important;
+     }
+}
+@media (min-width: 960px){
+	.ui-confirm-dialog{
+		left: 35% !important;
+	}
+}
+
+@media (min-width: 640px) and (max-width: 960px) {
+	.ui-confirm-dialog{
+		left: 23% !important;
+	}
+}
+@media (max-width: 640px) {
+     .ui-confirm-dialog{
+		left: 14% !important;
+	}
+}

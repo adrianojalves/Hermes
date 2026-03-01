@@ -1,0 +1,136 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui"
+	template="/WEB-INF/templates/Layout.xhtml">
+	<f:metadata>
+		<f:viewAction action="#{pesquisaDespesasBean.inicializar}"></f:viewAction>
+	</f:metadata>
+
+	<ui:define name="content">
+		<div class="ui-fluid paginas">
+			<h:form id="frm">
+				<div style="margin-top: 60px" />
+				<p:growl autoUpdate="false" id="msg" sticky="false" life="6000" />
+
+				<p:toolbar style="margin-top: 10px">
+
+					<p:toolbarGroup>
+						<p:commandButton process="@this painel" icon="fa fa-search"
+							value="Pesquisar" update="tabela" />
+					</p:toolbarGroup>
+
+					<p:toolbarGroup styleClass="botoes-cadastro" align="right">
+						<p:button icon="fa fa-plus" value="Novo"
+							outcome="CadastroDespesa?faces-redirect=true" process="@this" />
+					</p:toolbarGroup>
+
+				</p:toolbar>
+
+				<p:panelGrid styleClass="remove-borda" layout="grid" columns="2"
+					id="painel" style="margin-top: 15px"
+					columnClasses="ui-grid-col-5, ui-grid-col-5">
+
+					<p:outputLabel value="Conta">
+						<p:inputText value="#{pesquisaDespesasBean.filtro.conta}"
+							styleClass="campo35 direita" />
+					</p:outputLabel>
+
+					<p:outputLabel value="Cliente" for="cliente">
+						<p:autoComplete id="cliente" label="Cliente"
+							placeholder="Digite o nome do cliente ou clique na lupa para pesquisar"
+							value="#{pesquisaDespesasBean.filtro.codCliente}"
+							completeMethod="#{completerMethods.completaCliente}"
+							forceSelection="true" var="cli" itemLabel="#{cli.nome}"
+							itemValue="#{cli}" styleClass="campo90 pesquisaLupa"
+							minQueryLength="2" maxResults="10">
+							<f:converter binding="#{converter}" />
+							<p:ajax event="itemSelect"
+								update=":frm:cliente :frm:msg tabela" />
+						</p:autoComplete>
+						<p:commandButton style="width:35px" icon="ui-icon-search"
+							title="Pesquisar" process="@this" update="@none" id="bpesqcli"
+							action="#{dialogosBean.abrirDialogoCliente}"
+							ignoreAutoUpdate="true">
+							<p:ajax event="dialogReturn"
+								listener="#{pesquisaDespesasBean.capturaCliente}"
+								update=":frm:cliente :frm:msg tabela" />
+						</p:commandButton>
+					</p:outputLabel>
+					
+					<p:outputLabel value="Período Inicial" for="periodoInicial">
+						<p:calendar styleClass="campo50" showOn="button"
+							id="periodoInicial"
+							value="#{pesquisaDespesasBean.filtro.dataInicial}"
+							navigator="true" pattern="#{patterns.data}" locale="pt_BR"
+							mask="true" />
+					</p:outputLabel>
+					<p:outputLabel value="Período Final" for="periodoFinal">
+						<p:calendar styleClass="campo50" showOn="button" id="periodoFinal"
+							value="#{pesquisaDespesasBean.filtro.dataFinal}"
+							navigator="true" pattern="#{patterns.data}" locale="pt_BR"
+							mask="true" />
+					</p:outputLabel>
+
+				</p:panelGrid>
+
+				<p:dataTable value="#{pesquisaDespesasBean.model}" reflow="true"
+					style="margin-top:15px" id="tabela"
+					emptyMessage="Nenhuma despesa encontrada." rows="20"
+					paginator="true" paginatorAlwaysVisible="false" lazy="true"
+					var="objeto" selection="#{pesquisaDespesasBean.despesa}"
+					rowKey="#{objeto.id}" styleClass="tabela">
+
+					<f:facet name="header" style="font-size: 1.2em">
+            			Lista de Despesas
+			        </f:facet>
+
+					<p:column width="100" headerText="Conta"
+						styleClass="direita">
+						<h:outputText value="#{objeto.conta}" />
+					</p:column>
+
+					<p:column headerText="Cliente" >
+						<h:outputText value="#{objeto.codCliente.nome}" />
+					</p:column>
+
+					<p:column headerText="Data" width="90" styleClass="centro">
+						<h:outputText value="#{objeto.data}" >
+							<f:convertDateTime pattern="#{patterns.data}" locale="#{patterns.locale}" />
+						</h:outputText>
+					</p:column>
+					
+					<p:column headerText="Valor" width="130" styleClass="direita">
+						<h:outputText value="#{objeto.valor}" >
+							<f:convertNumber pattern="#{patterns.numero}" />
+						</h:outputText>
+					</p:column>
+
+					<p:column styleClass="centro" headerText="Operações" width="80">
+						<p:panelGrid columns="2" layout="grid" class="coluna-tabela">
+							<p:commandButton icon="fa fa-edit" title="Editar"
+								action="#{pesquisaDespesasBean.editar}" process="@this">
+
+								<f:setPropertyActionListener
+									target="#{pesquisaDespesasBean.despesa}" value="#{objeto}" />
+							</p:commandButton>
+
+							<p:commandButton icon="fa fa-trash" title="Excluir"
+								action="#{pesquisaDespesasBean.excluir}" process="@this"
+								update="tabela :frm:msg">
+
+								<f:setPropertyActionListener
+									target="#{pesquisaDespesasBean.despesa}" value="#{objeto}" />
+
+								<p:confirm icon="ui-icon-alert" header="Confirmação de exclusão"
+									message="Tem certeza que deseja excluir a despesa #{objeto.descricao}?" />
+							</p:commandButton>
+						</p:panelGrid>
+					</p:column>
+				</p:dataTable>
+			</h:form>
+		</div>
+	</ui:define>
+
+</ui:composition>

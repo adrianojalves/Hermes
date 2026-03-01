@@ -1,0 +1,97 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:o="http://omnifaces.org/ui"
+	template="/WEB-INF/templates/Layout.xhtml">
+	<f:metadata>
+		<f:viewAction action="#{pesquisaClientesBean.inicializar}"></f:viewAction>
+	</f:metadata>
+
+	<ui:define name="content">
+		<div class="ui-fluid paginas">
+			<h:form id="frm">
+				<div style="margin-top: 60px" />
+				<p:growl autoUpdate="false" id="msg" sticky="false" life="6000" />
+
+				<p:toolbar style="margin-top: 10px">
+
+					<p:toolbarGroup>
+						<p:commandButton process="@this painel" icon="fa fa-search"
+							value="Pesquisar" update="tabela" />
+					</p:toolbarGroup>
+
+					<p:toolbarGroup styleClass="botoes-cadastro" align="right">
+						<p:button icon="fa fa-plus" value="Novo"
+							outcome="CadastroCliente?faces-redirect=true"
+							process="@this" />
+					</p:toolbarGroup>
+
+				</p:toolbar>
+
+				<p:panelGrid styleClass="remove-borda" layout="grid" columns="3"
+					id="painel" style="margin-top: 15px"
+					columnClasses="ui-grid-col-5, ui-grid-col-5">
+
+					<p:outputLabel value="Nome">
+						<p:inputText value="#{pesquisaClientesBean.filtro.nome}" />
+					</p:outputLabel>
+					
+									
+
+				</p:panelGrid>
+
+				<p:dataTable value="#{pesquisaClientesBean.model}" reflow="true"
+					style="margin-top:15px" id="tabela"
+					emptyMessage="Nenhum cliente encontrado." rows="20"
+					paginator="true" paginatorAlwaysVisible="false" lazy="true"
+					var="objeto"
+					selection="#{pesquisaClientesBean.cliente}"
+					rowKey="#{objeto.id}" styleClass="tabela">
+
+					<f:facet name="header" style="font-size: 1.2em">
+            			Lista de Clientes
+			        </f:facet>
+
+					<p:column width="35" headerText="Id" sortBy="#{objeto.id}" styleClass="direita">
+						<h:outputText value="#{objeto.id}" />
+					</p:column>
+					
+					<p:column headerText="Nome" sortBy="#{objeto.nome}">
+						<h:outputText value="#{objeto.nome}" />
+					</p:column>
+					
+					<p:column headerText="Cidade" styleClass="centro">
+						<h:outputText value="#{objeto.cidade}" />
+					</p:column>
+					
+					<p:column styleClass="centro" headerText="Operações" width="80">
+						<p:panelGrid columns="2" layout="grid" class="coluna-tabela">
+							<p:commandButton icon="fa fa-edit" title="Editar"
+								action="#{pesquisaClientesBean.editar}" process="@this">
+
+								<f:setPropertyActionListener
+									target="#{pesquisaClientesBean.cliente}"
+									value="#{objeto}" />
+							</p:commandButton>
+
+							<p:commandButton icon="fa fa-trash" title="Excluir"
+								action="#{pesquisaClientesBean.excluir}" process="@this"
+								update="tabela :frm:msg">
+
+								<f:setPropertyActionListener
+									target="#{pesquisaClientesBean.cliente}"
+									value="#{objeto}" />
+
+								<p:confirm icon="ui-icon-alert" header="Confirmação de exclusão"
+									message="Tem certeza que deseja excluir o cliente #{objeto.nome}?" />
+							</p:commandButton>
+						</p:panelGrid>
+					</p:column>
+				</p:dataTable>
+			</h:form>
+		</div>
+	</ui:define>
+
+</ui:composition>

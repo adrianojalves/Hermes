@@ -1,0 +1,28 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:h="http://xmlns.jcp.org/jsf/html">
+	<h:form id="frmMenu">
+		<p:dock position="bottom">
+			<p:menuitem process="@this" value="Usuários" icon="/Hermes/javax.faces.resource/images/usuarios.png.xhtml?ln=ajasoftware"
+				outcome="/usuarios/ListaUsuarios.xhtml"	ajax="false" />
+			<p:menuitem process="@this" value="Contas" icon="/Hermes/javax.faces.resource/images/contas.png.xhtml?ln=ajasoftware"
+				outcome="/contas/ListaContas.xhtml"	 />
+			<p:menuitem process="@this" value="Clientes" icon="/Hermes/javax.faces.resource/images/clientes.png.xhtml?ln=ajasoftware"
+				outcome="/clientes/ListaClientes.xhtml"	 />
+			<p:menuitem process="@this" value="Receitas" icon="/Hermes/javax.faces.resource/images/receitas.png.xhtml?ln=ajasoftware"
+				outcome="/receitas/ListaReceitas.xhtml"	 />
+			<p:menuitem process="@this" value="Despesas" icon="/Hermes/javax.faces.resource/images/despesas.png.xhtml?ln=ajasoftware"
+				outcome="/despesas/ListaDespesas.xhtml"	 />
+			<p:menuitem process="@this" value="Relatório Diário" icon="/Hermes/javax.faces.resource/images/reldiario.png.xhtml?ln=ajasoftware"
+				outcome="/tela_relatorio/RelatorioDiario.xhtml"	 />
+			<p:menuitem process="@this" value="Relatório Anual" icon="/Hermes/javax.faces.resource/images/relanual.png.xhtml?ln=ajasoftware"
+				outcome="/tela_relatorio/RelatorioAnual.xhtml"	 />
+			<p:menuitem process="@this" value="Exportar Despesas" icon="/Hermes/javax.faces.resource/images/bcsv.png.xhtml?ln=ajasoftware"
+				outcome="/tela_relatorio/ExportarDespesas.xhtml"	 />
+			<p:menuitem process="@this" value="Sair" icon="/Hermes/javax.faces.resource/images/logout.png.xhtml?ln=ajasoftware"
+					action="#{seguranca.logout}" />
+		</p:dock>
+	</h:form>
+
+</ui:composition>

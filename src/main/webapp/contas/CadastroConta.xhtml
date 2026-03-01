@@ -1,0 +1,75 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui"
+	template="/WEB-INF/templates/Layout.xhtml">
+
+	<f:metadata>
+		<o:viewParam name="cod" value="#{cadastroContaBean.conta}"
+			converter="#{converter}" />
+		<f:viewAction action="#{cadastroContaBean.inicializar}"></f:viewAction>
+	</f:metadata>
+
+	<ui:define name="content">
+		<div class="ui-fluid paginas">
+			<h:form id="frm">
+				<div style="margin-top: 60px" />
+
+				<p:growl id="msg" autoUpdate="true" life="6000" sticky="false" />
+
+				<p:toolbar style="margin-top: 10px">
+					<p:toolbarGroup>
+						<p:commandButton process="@this painelCadastro" icon="fa fa-save"
+							update="frm" value="Salvar"
+							action="#{cadastroContaBean.guardar}" />
+					</p:toolbarGroup>
+
+					<p:toolbarGroup styleClass="botoes-cadastro" align="right">
+						<p:commandButton process="@this" icon="fa fa-plus"
+							update="frm" value="Novo"
+							action="#{cadastroContaBean.limpar}" />
+						
+						<p:separator />
+						
+						<p:button icon="fa fa-undo"
+							outcome="ListaContas?faces-redirect=true" value="Pesquisa"
+							process="@this">
+						</p:button>
+					</p:toolbarGroup>
+				</p:toolbar>
+
+				<p:fieldset legend="Dados Gerais" style="margin-top: 10px;">
+					<p:panelGrid styleClass="remove-borda painel-cadastro"
+						layout="grid" columns="1" id="painelCadastro"
+						style="line-heigth:20px" columnClasses="ui-grid-col-10">
+
+						<p:outputLabel value="Código: " for="codigo">
+							<p:inputText styleClass="campo25" id="codigo" disabled="#{cadastroContaBean.possuiId}"
+								value="#{cadastroContaBean.conta.id}" maxlength="20" />
+						</p:outputLabel>
+
+						<p:outputLabel value="Nome" for="nome">
+							<p:inputText styleClass="campo75" id="nome"
+								value="#{cadastroContaBean.conta.nome}" />
+						</p:outputLabel>
+						
+						<p:outputLabel value="Código Aux: " for="codigoAuxiliar">
+							<p:inputText styleClass="campo25" id="codigoAuxiliar"
+								value="#{cadastroContaBean.conta.codigoAuxiliar}" maxlength="20" />
+						</p:outputLabel>
+						
+						<p:outputLabel value="Status" class="campo25" for="status">
+							<p:selectOneMenu id="status" value="#{cadastroContaBean.conta.status}">
+					            <f:selectItem itemLabel="Ativo" itemValue="true" />
+					            <f:selectItem itemLabel="Inativo" itemValue="false" />
+					        </p:selectOneMenu>
+						</p:outputLabel>
+
+						<p:keyFilter for="codigo" mask="int" preventPaste="false" />
+					</p:panelGrid>
+				</p:fieldset>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

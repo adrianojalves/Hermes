@@ -1,0 +1,81 @@
+package br.com.ajasoftware.view.relatorios;
+
+import java.io.Serializable;
+import java.util.Date;
+
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Named;
+import javax.validation.constraints.NotNull;
+
+import org.primefaces.event.SelectEvent;
+
+import br.com.ajasoftware.model.cliente.Cliente;
+import br.com.ajasoftware.util.Trata;
+
+@Named
+@RequestScoped
+public class RelatorioDiarioBean extends RelatoriosBean implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	@NotNull
+	private Date dataInicial;
+	
+	@NotNull
+	private Date dataFinal;
+	
+	@NotNull
+	private Cliente codCliente;
+
+	private Integer paginaInicial;
+	
+	public void imprimir() {
+		parametros.put("dataInicial", Trata.FormData(dataInicial));
+		parametros.put("dataFinal", Trata.FormData(dataFinal));
+		parametros.put("codCliente", codCliente.getId());
+		parametros.put("paginaInicial", paginaInicial);
+		this.nomeReport="rel_diario";
+		this.nomeArquivo="RelatorioDiario";
+		super.imprimir();
+	}
+
+	public Date getDataInicial() {
+		return dataInicial;
+	}
+
+	public void setDataInicial(Date dataInicial) {
+		this.dataInicial = dataInicial;
+	}
+
+	public Date getDataFinal() {
+		return dataFinal;
+	}
+
+	public void setDataFinal(Date dataFinal) {
+		this.dataFinal = dataFinal;
+	}
+
+	public Cliente getCodCliente() {
+		return codCliente;
+	}
+
+	public void setCodCliente(Cliente codCliente) {
+		this.codCliente = codCliente;
+	}
+	public void capturaCliente(SelectEvent event) {
+		if(event.getObject()!=null) {
+			codCliente = ((Cliente)event.getObject());
+		}
+	}
+
+	public Integer getPaginaInicial() {
+		return paginaInicial;
+	}
+
+	public void setPaginaInicial(Integer paginaInicial) {
+		this.paginaInicial = paginaInicial;
+	}
+}
